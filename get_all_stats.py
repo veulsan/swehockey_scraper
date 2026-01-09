@@ -3,53 +3,99 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import csv
+import sys
 
 DEBUG = 1
 
 # Initialize an empty stats dictionary
 player_stats = {}
 
-# Team name mapping: short name -> full name
+# Team name mapping: any variation -> canonical name
 team_name_mapping = {}
+# Canonical team names (base name without suffixes)
+canonical_teams = {}
+
+def get_canonical_team_name(team_name):
+    """
+    Get the canonical (base) name for a team by removing suffixes like '1', '2', 'HC', etc.
+    Examples:
+    - 'Boo HC 1' -> 'Boo HC'
+    - 'BOO1' -> 'Boo HC'
+    - 'Boo HC 2' -> 'Boo HC'
+    - 'BOO2' -> 'Boo HC'
+    """
+    team_name = team_name.strip()
+
+    # Check if already in canonical teams
+    if team_name in canonical_teams:
+        return canonical_teams[team_name]
+
+    # Remove trailing numbers and common suffixes
+    # Pattern: Remove ' 1', ' 2', '1', '2' at the end
+    cleaned = re.sub(r'\s*[12]$', '', team_name)
+
+    # Normalize to title case for consistency
+    canonical = cleaned.strip()
+
+    # Store both variations
+    canonical_teams[team_name] = canonical
+    canonical_teams[cleaned] = canonical
+
+    DEBUG == 1 and print(f"Canonical team name: '{team_name}' -> '{canonical}'")
+
+    return canonical
 
 def normalize_team_name(short_name, full_names):
     """
-    Map a short team name (e.g., 'BOO', 'VHF', 'SKE') to its full name.
-    Handles abbreviations like SKE -> Skellefteå AIK
+    Map a short team name (e.g., 'BOO', 'VHF', 'SKE', 'BOO1', 'BOO2') to its canonical full name.
+    Handles abbreviations and team number suffixes.
     """
-    short_name = short_name.strip().upper()
+    short_name = short_name.strip()
 
-    # Already mapped?
+    # Check if already mapped
     if short_name in team_name_mapping:
         return team_name_mapping[short_name]
+
+    short_upper = short_name.upper()
+
+    # Remove trailing numbers from short name for matching
+    short_base = re.sub(r'[12]$', '', short_upper)
 
     best_match = None
     best_score = 0
 
     for full_name in full_names:
-        full_upper = full_name.upper()
+        # Get canonical version of full name
+        canonical = get_canonical_team_name(full_name)
+        canonical_upper = canonical.upper()
 
-        # Exact match
-        if short_name == full_upper:
-            best_match = full_name
+        # Exact match with canonical name
+        if short_upper == canonical_upper:
+            best_match = canonical
+            best_score = 1.0
+            break
+
+        # Match short base with canonical
+        if short_base == canonical_upper:
+            best_match = canonical
             best_score = 1.0
             break
 
         # Starts with (BOO matches Boo HC)
-        if full_upper.startswith(short_name):
+        if canonical_upper.startswith(short_base):
             score = 0.95
             if score > best_score:
                 best_score = score
-                best_match = full_name
+                best_match = canonical
 
         # Check if any word starts with the short name (SKE in Skellefteå AIK)
-        words = full_upper.split()
+        words = canonical_upper.split()
         for word in words:
-            if word.startswith(short_name):
+            if word.startswith(short_base):
                 score = 0.9
                 if score > best_score:
                     best_score = score
-                    best_match = full_name
+                    best_match = canonical
                 break
 
     if best_match:
@@ -57,13 +103,20 @@ def normalize_team_name(short_name, full_names):
         DEBUG == 1 and print(f"Mapped team: '{short_name}' -> '{best_match}'")
         return best_match
 
-    print(f"WARNING: Could not map team '{short_name}'")
-    return short_name
+    # If no match found, return canonical version of the input
+    canonical = get_canonical_team_name(short_name)
+    team_name_mapping[short_name] = canonical
+    print(f"WARNING: Could not map team '{short_name}', using canonical: '{canonical}'")
+    return canonical
 
 def getLineUps(matchid, matchdate, gametext, series):
     home_team, away_team = map(str.strip, gametext.split(" - "))
     parsed_home_team = re.sub(r"\s*\(.*?\)|\s+", " ", home_team).strip()
     parsed_away_team = re.sub(r"\s*\(.*?\)|\s+", " ", away_team).strip()
+
+    # Normalize to canonical team names
+    canonical_home_team = get_canonical_team_name(parsed_home_team)
+    canonical_away_team = get_canonical_team_name(parsed_away_team)
 
     # URL of the webpage
     lineUpsUrl = f"https://stats.swehockey.se/Game/LineUps/{matchid}"
@@ -101,11 +154,14 @@ def getLineUps(matchid, matchdate, gametext, series):
             # Parse to remove the part in parentheses and extra spaces
             team_name = re.sub(r"\s*\(.*?\)|\s+", " ", team_name).strip()
 
+            # Normalize team name to canonical form
+            canonical_team_name = get_canonical_team_name(team_name)
+
             player_name = f"{firstname} {lastname}"
-            ensure_player(player_stats, team_name, f"{player_name}", number)
-            DEBUG == 1 and print(f"Game played Team: {team_name} Player: {player_name}")
-            player_stats[team_name][player_name]["games_played"] += 1
-        return parsed_home_team, parsed_away_team
+            ensure_player(player_stats, canonical_team_name, f"{player_name}", number)
+            DEBUG == 1 and print(f"Game played Team: {canonical_team_name} (from {team_name}) Player: {player_name}")
+            player_stats[canonical_team_name][player_name]["games_played"] += 1
+        return canonical_home_team, canonical_away_team
     else:
         print(f"Failed to fetch the webpage. Status code: {response.status_code}")
         return (None, None)
@@ -180,7 +236,12 @@ def getGameStats(game_id, serie, matchdate, gametext):
     home_team, away_team = map(str.strip, gametext.split(" - "))
     parsed_home_team = re.sub(r"\s*\(.*?\)|\s+", " ", home_team).strip()
     parsed_away_team = re.sub(r"\s*\(.*?\)|\s+", " ", away_team).strip()
-    DEBUG == 1 and print(f"Processing gamestats for Matchdate: {matchdate} Serie: {serie} Home Team: {parsed_home_team}, Away Team: {parsed_away_team}")
+
+    # Normalize to canonical team names
+    canonical_home_team = get_canonical_team_name(parsed_home_team)
+    canonical_away_team = get_canonical_team_name(parsed_away_team)
+
+    DEBUG == 1 and print(f"Processing gamestats for Matchdate: {matchdate} Serie: {serie} Home Team: {canonical_home_team}, Away Team: {canonical_away_team}")
 
     url = 'http://stats.swehockey.se/Game/Events/' + game_id
     df_gamedata = pd.read_html(url, match='Actions', attrs={'class': 'tblContent'}, displayed_only=False)
@@ -208,22 +269,22 @@ def getGameStats(game_id, serie, matchdate, gametext):
             scoring_team = ""
             # Avgör vilket lag som gjorde målet
             if new_home != home_goals:
-                DEBUG == 1 and print(f"Scoring team {parsed_home_team}")
+                DEBUG == 1 and print(f"Scoring team {canonical_home_team}")
                 home_goals = new_home
-                scoring_team = parsed_home_team
+                scoring_team = canonical_home_team
             elif new_away != away_goals:
-                DEBUG == 1 and print(f"Scoring team {parsed_away_team}")
+                DEBUG == 1 and print(f"Scoring team {canonical_away_team}")
                 away_goals = new_away
-                scoring_team = parsed_away_team
+                scoring_team = canonical_away_team
 
-            players = parse_goal(players_str, matchdate, serie, scoring_team, parsed_home_team, parsed_away_team, game_id)
+            players = parse_goal(players_str, matchdate, serie, scoring_team, canonical_home_team, canonical_away_team, game_id)
         elif not pd.isna(event) and re.match(r"(\d+ min)", event):
             match = re.match(r"(\d+) min", event)
             pim = int(match.group(1))
             if pim == 1:
                 pim = 2
             DEBUG == 1 and print(f"Penalty found for {matchdate} {event} {team} {time}: {players_str} {match.group(1)}")
-            playes = parse_penalty(players_str, matchdate, serie, team, pim, parsed_home_team, parsed_away_team, game_id)
+            playes = parse_penalty(players_str, matchdate, serie, team, pim, canonical_home_team, canonical_away_team, game_id)
 
 
 def parse_penalty(player_string, matchdate, serie, team, time, home_team, away_team, game_id):
@@ -563,10 +624,22 @@ def print_all_stats(stats):
         print("\n")
 
 if __name__ == "__main__":
-    # Process schedule and collect statistics
-    #getAllScheduledGames('19563')
-    # SHL
-    getAllScheduledGames('18263')
+    # Check if schedule IDs are provided as command-line arguments
+    if len(sys.argv) > 1:
+        # Use schedule IDs from command-line arguments
+        schedule_ids = sys.argv[1:]
+    else:
+        # Default schedule IDs if none provided
+        print("No schedule IDs provided. Usage: python3 get_all_stats.py <schedule_id1> [schedule_id2] ...")
+        print("Using default schedule ID: 19563")
+        schedule_ids = ['19563']
+
+    # Process each schedule ID
+    for schedule_id in schedule_ids:
+        print(f"\n{'='*60}")
+        print(f"Processing schedule ID: {schedule_id}")
+        print(f"{'='*60}\n")
+        getAllScheduledGames(schedule_id)
 
     # Print stats to console
     print_all_stats(player_stats)

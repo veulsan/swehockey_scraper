@@ -33,26 +33,24 @@ pip install pandas requests beautifulsoup4
 
 ### Basic Usage
 
-Edit the `__main__` section in `get_all_stats.py` to specify the schedule ID(s) you want to scrape:
-
-```python
-if __name__ == "__main__":
-    # Process schedule and collect statistics
-    getAllScheduledGames('19563')  # Replace with your schedule ID
-
-    # Print stats to console
-    print_all_stats(player_stats)
-
-    # Write CSV files
-    write_player_stats_csv(player_stats, "player_stats.csv")
-    write_events_csv(player_stats, "player_events.csv")
-```
-
-### Running the Script
+Run the script with one or more schedule IDs as command-line arguments:
 
 ```bash
+# Single schedule ID
+python3 get_all_stats.py 19563
+
+# Multiple schedule IDs
+python3 get_all_stats.py 19563 19565 19701
+
+# No arguments (uses default schedule ID: 19563)
 python3 get_all_stats.py
 ```
+
+The script will:
+1. Process all provided schedule IDs sequentially
+2. Collect statistics from all games across all schedules
+3. Print combined statistics to the console
+4. Export combined data to CSV files
 
 ### Finding Schedule IDs
 
@@ -95,23 +93,25 @@ Both CSV files use semicolon (`;`) as the delimiter for compatibility with Swedi
 
 ## Example Workflow
 
-1. **Find your tournament** on stats.swehockey.se
-2. **Copy the schedule ID** from the URL
-3. **Edit** `get_all_stats.py` and replace the schedule ID
-4. **Run** the script: `python3 get_all_stats.py`
-5. **Analyze** the generated CSV files in Excel, Google Sheets, or your preferred tool
+1. **Find your tournament(s)** on stats.swehockey.se
+2. **Copy the schedule ID(s)** from the URL
+3. **Run** the script with the schedule ID(s): `python3 get_all_stats.py 19563 19565`
+4. **Analyze** the generated CSV files in Excel, Google Sheets, or your preferred tool
 
 ## Example Schedule IDs
 
 Some example tournament schedule IDs:
 
-```python
+```bash
 # U15 tournaments
-getAllScheduledGames('19563')  # U15P DM Röd Grupp 2
-getAllScheduledGames('19565')  # U15P DM Blå Grupp 2
+python3 get_all_stats.py 19563       # U15P DM Röd Grupp 2
+python3 get_all_stats.py 19565       # U15P DM Blå Grupp 2
+
+# Multiple tournaments at once
+python3 get_all_stats.py 19563 19565 # Both U15 groups
 
 # SHL (Swedish Hockey League)
-getAllScheduledGames('18263')  # SHL 2024-2025
+python3 get_all_stats.py 18263       # SHL 2024-2025
 ```
 
 ## Debug Mode

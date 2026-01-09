@@ -35,38 +35,38 @@ Brynäs IF;53;Luke Witkowski;10;0;0;0
 Brynäs IF;15;Simon Bertilsson;8;0;1;0
 Brynäs IF;31;Erik Källgren;8;0;0;0
 Växjö Lakers HC;28;Hugo Gustafsson;9;5;1;0
-Växjö Lakers HC;29;Sebastian Strandberg;25;4;6;0
-Växjö Lakers HC;91;Felix Robert;33;8;7;0
-Växjö Lakers HC;12;Otto Koivula;4;1;1;0
-Växjö Lakers HC;13;Dylan Mclaughlin;33;8;10;0
-Växjö Lakers HC;16;Ville Svensson;22;1;4;0
-Växjö Lakers HC;4;Keegan Lowe;33;0;7;0
-Växjö Lakers HC;36;Elias Rosén;26;0;0;0
-Växjö Lakers HC;62;Manuel Ågren;24;1;8;0
-Växjö Lakers HC;40;Dennis Rasmussen;33;13;9;0
-Växjö Lakers HC;42;Kalle Kratz;31;4;2;0
-Växjö Lakers HC;21;Brian Cooper;27;2;4;0
-Växjö Lakers HC;6;Petter Granberg;33;1;4;0
-Växjö Lakers HC;25;Lucas Elvenes;33;11;22;0
-Växjö Lakers HC;24;Karl Henriksson;32;7;3;0
-Växjö Lakers HC;19;Reid Gardiner;30;11;9;0
-Växjö Lakers HC;49;Leo Sahlin Wallenius;16;0;0;0
+Växjö Lakers HC;29;Sebastian Strandberg;25;4;6;6
+Växjö Lakers HC;91;Felix Robert;33;8;7;12
+Växjö Lakers HC;12;Otto Koivula;4;1;1;2
+Växjö Lakers HC;13;Dylan Mclaughlin;33;8;10;4
+Växjö Lakers HC;16;Ville Svensson;22;1;4;4
+Växjö Lakers HC;4;Keegan Lowe;33;0;7;18
+Växjö Lakers HC;36;Elias Rosén;26;0;0;4
+Växjö Lakers HC;62;Manuel Ågren;24;1;8;20
+Växjö Lakers HC;40;Dennis Rasmussen;33;13;9;10
+Växjö Lakers HC;42;Kalle Kratz;31;4;2;2
+Växjö Lakers HC;21;Brian Cooper;27;2;4;16
+Växjö Lakers HC;6;Petter Granberg;33;1;4;18
+Växjö Lakers HC;25;Lucas Elvenes;33;11;22;12
+Växjö Lakers HC;24;Karl Henriksson;32;7;3;20
+Växjö Lakers HC;19;Reid Gardiner;30;11;9;12
+Växjö Lakers HC;49;Leo Sahlin Wallenius;16;0;0;8
 Växjö Lakers HC;8;Zachary Giuttari;25;0;4;0
 Växjö Lakers HC;70;Adam Åhman;33;0;1;0
 Växjö Lakers HC;32;Ludvig Persson;33;0;2;0
 Växjö Lakers HC;69;"Morgan              (LW) Anderberg";11;0;0;0
-Växjö Lakers HC;94;Joel Persson;32;5;21;0
-Växjö Lakers HC;11;Brogan Rafferty;29;5;16;0
-Växjö Lakers HC;41;Ludvig Nilsson;31;2;4;0
+Växjö Lakers HC;94;Joel Persson;32;5;21;26
+Växjö Lakers HC;11;Brogan Rafferty;29;5;16;2
+Växjö Lakers HC;41;Ludvig Nilsson;31;2;4;8
 Växjö Lakers HC;10;"Eemeli              (LD) Suomi";1;0;0;0
-Växjö Lakers HC;10;Eemeli Suomi;23;5;3;0
+Växjö Lakers HC;10;Eemeli Suomi;23;5;3;8
 Växjö Lakers HC;41;"Ludvig              (LW) Nilsson";1;0;0;0
 Växjö Lakers HC;12;"Otto              (LW) Koivula";1;0;0;0
 Växjö Lakers HC;16;"Ville              (LW) Svensson";7;0;0;0
 Växjö Lakers HC;69;Morgan Anderberg;15;1;1;0
 Växjö Lakers HC;88;"Albin              (RW) Laksonen";2;0;0;0
 Växjö Lakers HC;23;"Max              (LW) Isaksson";1;0;0;0
-Växjö Lakers HC;17;Erik Andersson;17;1;3;0
+Växjö Lakers HC;17;Erik Andersson;17;1;3;2
 Växjö Lakers HC;1;Felix Timraz-Westin;1;0;0;0
 Växjö Lakers HC;18;"Emon              (RW) Kulmala";1;0;0;0
 Växjö Lakers HC;88;Liam Pettersson;2;0;0;0
@@ -97,53 +97,32 @@ BIF;2;Victor Raftheim Hedin;0;0;0;4
 BIF;20;Tyler Vesel;0;0;0;6
 BIF;53;Luke Witkowski;0;0;0;2
 BIF;15;Simon Bertilsson;0;0;0;4
-VÄX;29;Sebastian Strandberg;0;0;0;6
-VÄX;4;Keegan Lowe;0;0;0;18
-VÄX;49;Leo Sahlin Wallenius;0;0;0;8
-VÄX;19;Reid Gardiner;0;0;0;12
-VÄX;12;Otto Koivula;0;0;0;2
-VÄX;10;Eemeli Suomi;0;0;0;8
-VÄX;91;Felix Robert;0;0;0;12
-VÄX;24;Karl Henriksson;0;0;0;20
-VÄX;21;Brian Cooper;0;0;0;16
-VÄX;6;Petter Granberg;0;0;0;18
-VÄX;25;Lucas Elvenes;0;0;0;12
-VÄX;94;Joel Persson;0;0;0;26
-VÄX;42;Kalle Kratz;0;0;0;2
-VÄX;13;Dylan Mclaughlin;0;0;0;4
-VÄX;36;Elias Rosén;0;0;0;4
-VÄX;62;Manuel Ågren;0;0;0;20
-VÄX;11;Brogan Rafferty;0;0;0;2
-VÄX;41;Ludvig Nilsson;0;0;0;8
-VÄX;40;Dennis Rasmussen;0;0;0;10
-VÄX;16;Ville Svensson;0;0;0;4
-VÄX;17;Erik Andersson;0;0;0;2
-Frölunda HC;1;Lars Johansson;33;0;0;0
+Frölunda HC;1;Lars Johansson;33;0;0;2
 Frölunda HC;30;Tobias Normann;33;0;1;0
-Frölunda HC;46;Dominik Egli;27;3;14;0
-Frölunda HC;7;Henrik Tömmernes;33;3;16;0
-Frölunda HC;12;Max Friberg;33;4;9;0
-Frölunda HC;40;Jacob Peterson;33;7;7;0
-Frölunda HC;21;Jere Innala;31;11;13;0
-Frölunda HC;43;Tom Nilsson;25;2;3;0
-Frölunda HC;33;Linus Högberg;33;7;10;0
-Frölunda HC;92;Filip Cederqvist;31;6;8;0
-Frölunda HC;25;Arttu Ruotsalainen;31;11;12;0
+Frölunda HC;46;Dominik Egli;27;3;14;14
+Frölunda HC;7;Henrik Tömmernes;33;3;16;12
+Frölunda HC;12;Max Friberg;33;4;9;6
+Frölunda HC;40;Jacob Peterson;33;7;7;10
+Frölunda HC;21;Jere Innala;31;11;13;12
+Frölunda HC;43;Tom Nilsson;25;2;3;6
+Frölunda HC;33;Linus Högberg;33;7;10;6
+Frölunda HC;92;Filip Cederqvist;31;6;8;12
+Frölunda HC;25;Arttu Ruotsalainen;31;11;12;16
 Frölunda HC;86;Erik Thorell;17;4;11;0
-Frölunda HC;2;Christian Folin;30;2;2;0
-Frölunda HC;26;Isac Heens;32;1;6;0
-Frölunda HC;41;Ivar Stenberg;25;7;17;0
-Frölunda HC;27;Theodor Niederbach;33;10;14;0
-Frölunda HC;11;Max Lindholm;33;13;11;0
-Frölunda HC;10;Max Westergård;7;0;0;0
-Frölunda HC;6;Filip Hasa;33;2;1;0
+Frölunda HC;2;Christian Folin;30;2;2;12
+Frölunda HC;26;Isac Heens;32;1;6;10
+Frölunda HC;41;Ivar Stenberg;25;7;17;4
+Frölunda HC;27;Theodor Niederbach;33;10;14;10
+Frölunda HC;11;Max Lindholm;33;13;11;16
+Frölunda HC;10;Max Westergård;7;0;0;2
+Frölunda HC;6;Filip Hasa;33;2;1;12
 Frölunda HC;17;Isac Born;13;0;1;0
-Frölunda HC;31;Nicklas Lasu;33;4;10;0
-Frölunda HC;32;Noah Hasa;28;5;5;0
+Frölunda HC;31;Nicklas Lasu;33;4;10;14
+Frölunda HC;32;Noah Hasa;28;5;5;8
 Frölunda HC;10;"Max              (RW) Westergård";6;0;0;0
-Frölunda HC;44;Noah Dower Nilsson;31;0;0;0
+Frölunda HC;44;Noah Dower Nilsson;31;0;0;6
 Frölunda HC;17;"Isac              (RW) Born";8;0;0;0
-Frölunda HC;38;Oskar Wahlberg;12;0;0;0
+Frölunda HC;38;Oskar Wahlberg;12;0;0;2
 Frölunda HC;10;"Max              (LW) Westergård";2;0;0;0
 Frölunda HC;17;"Isac              (LW) Born";2;0;0;0
 Frölunda HC;32;"Noah              (RW) Hasa";4;0;0;0
@@ -222,27 +201,6 @@ LHC;39;Ty Rattie;0;0;0;11
 LHC;14;Loke Krantz;0;0;0;10
 LHC;71;Eskild Bakke Olsen;0;0;0;2
 LHC;13;Jakub Vrana;0;0;0;38
-FRÖ;46;Dominik Egli;0;0;0;14
-FRÖ;7;Henrik Tömmernes;0;0;0;12
-FRÖ;11;Max Lindholm;0;0;0;16
-FRÖ;2;Christian Folin;0;0;0;12
-FRÖ;43;Tom Nilsson;0;0;0;6
-FRÖ;92;Filip Cederqvist;0;0;0;12
-FRÖ;44;Noah Dower Nilsson;0;0;0;6
-FRÖ;27;Theodor Niederbach;0;0;0;10
-FRÖ;21;Jere Innala;0;0;0;12
-FRÖ;26;Isac Heens;0;0;0;10
-FRÖ;25;Arttu Ruotsalainen;0;0;0;16
-FRÖ;33;Linus Högberg;0;0;0;6
-FRÖ;10;Max Westergård;0;0;0;2
-FRÖ;6;Filip Hasa;0;0;0;12
-FRÖ;31;Nicklas Lasu;0;0;0;14
-FRÖ;12;Max Friberg;0;0;0;6
-FRÖ;32;Noah Hasa;0;0;0;8
-FRÖ;38;Oskar Wahlberg;0;0;0;2
-FRÖ;40;Jacob Peterson;0;0;0;10
-FRÖ;41;Ivar Stenberg;0;0;0;4
-FRÖ;1;Lars Johansson;0;0;0;2
 Djurgårdens IF;35;Magnus Hellberg;30;0;1;0
 Djurgårdens IF;30;Hugo Hävelid;18;0;0;0
 Djurgårdens IF;28;Gustav Lindström;32;3;7;0
@@ -290,32 +248,32 @@ Djurgårdens IF;6;William Wiå;2;0;1;0
 Djurgårdens IF;42;"Marcus              (RW) Nordmark";2;0;0;0
 Djurgårdens IF;39;Hugo Severgårdh;1;0;0;0
 Djurgårdens IF;34;"Daniel              (LW) Brodin";1;0;0;0
-Skellefteå AIK;27;Oskar Vuollet;34;1;1;0
-Skellefteå AIK;12;Valter Lindberg;32;2;6;0
-Skellefteå AIK;9;Victor Stjernborg;22;2;5;0
-Skellefteå AIK;43;Max Krogdahl;22;0;5;0
-Skellefteå AIK;15;Lars Bryggman;29;5;6;0
-Skellefteå AIK;17;Pär Lindholm;34;3;12;0
-Skellefteå AIK;71;Jonathan Davidsson;23;3;5;0
-Skellefteå AIK;25;Pontus Johansson;34;6;12;0
-Skellefteå AIK;57;Emil Djuse;29;0;9;0
-Skellefteå AIK;29;Mikkel Aagaard;34;14;18;0
-Skellefteå AIK;24;Oscar Lindberg;34;23;23;0
-Skellefteå AIK;96;Rickard Hugg;34;11;26;0
-Skellefteå AIK;52;Arvid Lundberg;34;5;8;0
-Skellefteå AIK;7;Frans Haara;20;3;1;0
-Skellefteå AIK;8;Oliver Okuliar;34;13;9;0
-Skellefteå AIK;22;Jonathan Johnson;34;3;15;0
-Skellefteå AIK;14;Andreas Johnson;34;7;8;0
-Skellefteå AIK;3;Viktor Grahn;34;1;9;0
-Skellefteå AIK;64;Jonathan Pudas;34;12;23;0
+Skellefteå AIK;27;Oskar Vuollet;34;1;1;4
+Skellefteå AIK;12;Valter Lindberg;32;2;6;6
+Skellefteå AIK;9;Victor Stjernborg;22;2;5;6
+Skellefteå AIK;43;Max Krogdahl;22;0;5;49
+Skellefteå AIK;15;Lars Bryggman;29;5;6;10
+Skellefteå AIK;17;Pär Lindholm;34;3;12;12
+Skellefteå AIK;71;Jonathan Davidsson;23;3;5;6
+Skellefteå AIK;25;Pontus Johansson;34;6;12;20
+Skellefteå AIK;57;Emil Djuse;29;0;9;6
+Skellefteå AIK;29;Mikkel Aagaard;34;14;18;6
+Skellefteå AIK;24;Oscar Lindberg;34;23;23;36
+Skellefteå AIK;96;Rickard Hugg;34;11;26;8
+Skellefteå AIK;52;Arvid Lundberg;34;5;8;12
+Skellefteå AIK;7;Frans Haara;20;3;1;2
+Skellefteå AIK;8;Oliver Okuliar;34;13;9;26
+Skellefteå AIK;22;Jonathan Johnson;34;3;15;8
+Skellefteå AIK;14;Andreas Johnson;34;7;8;22
+Skellefteå AIK;3;Viktor Grahn;34;1;9;4
+Skellefteå AIK;64;Jonathan Pudas;34;12;23;8
 Skellefteå AIK;1;Anton Ringquist;13;0;0;0
 Skellefteå AIK;31;Jani Lampinen;32;0;0;0
 Skellefteå AIK;91;"Victor              (LW) Laz";11;0;0;0
 Skellefteå AIK;38;Strauss Mann;33;0;0;0
-Skellefteå AIK;4;Rasmus Bergqvist;30;0;1;0
+Skellefteå AIK;4;Rasmus Bergqvist;30;0;1;12
 Skellefteå AIK;33;"Zeb              (LW) Forsfjäll";6;0;0;0
-Skellefteå AIK;33;Zeb Forsfjäll;26;2;1;0
+Skellefteå AIK;33;Zeb Forsfjäll;26;2;1;6
 Skellefteå AIK;71;"Jonathan              (LW) Davidsson";1;0;0;0
 Skellefteå AIK;1;Caspar Lampe;1;0;0;0
 Skellefteå AIK;91;Victor Laz;2;0;2;0
@@ -325,27 +283,6 @@ Skellefteå AIK;18;Viktor Klingsell;2;1;0;0
 Skellefteå AIK;20;Zeb Lindgren;1;0;0;0
 Skellefteå AIK;11;"Theo              (LW) Landström";2;0;0;0
 Skellefteå AIK;9;"Victor              (LW) Stjernborg";3;0;0;0
-SKE;15;Lars Bryggman;0;0;0;10
-SKE;25;Pontus Johansson;0;0;0;20
-SKE;24;Oscar Lindberg;0;0;0;36
-SKE;12;Valter Lindberg;0;0;0;6
-SKE;71;Jonathan Davidsson;0;0;0;6
-SKE;8;Oliver Okuliar;0;0;0;26
-SKE;29;Mikkel Aagaard;0;0;0;6
-SKE;14;Andreas Johnson;0;0;0;22
-SKE;27;Oskar Vuollet;0;0;0;4
-SKE;57;Emil Djuse;0;0;0;6
-SKE;4;Rasmus Bergqvist;0;0;0;12
-SKE;9;Victor Stjernborg;0;0;0;6
-SKE;17;Pär Lindholm;0;0;0;12
-SKE;7;Frans Haara;0;0;0;2
-SKE;52;Arvid Lundberg;0;0;0;12
-SKE;33;Zeb Forsfjäll;0;0;0;6
-SKE;64;Jonathan Pudas;0;0;0;8
-SKE;22;Jonathan Johnson;0;0;0;8
-SKE;43;Max Krogdahl;0;0;0;49
-SKE;3;Viktor Grahn;0;0;0;4
-SKE;96;Rickard Hugg;0;0;0;8
 DIF;77;Valtteri Pulli;0;0;0;4
 DIF;38;Victor Eklund;0;0;0;10
 DIF;82;Colby Sissons;0;0;0;20
