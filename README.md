@@ -86,6 +86,8 @@ Detailed event log with columns:
 - `PLAYER TEAM` - Player's team
 - `HOME TEAM` - Home team name
 - `AWAY TEAM` - Away team name
+- `GAME ID` - Unique game identifier
+- `GAME LINK` - Direct link to game events page (https://stats.swehockey.se/Game/Events/[game_id])
 
 ## Data Format
 

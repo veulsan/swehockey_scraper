@@ -9,6 +9,57 @@ DEBUG = 1
 # Initialize an empty stats dictionary
 player_stats = {}
 
+# Team name mapping: short name -> full name
+team_name_mapping = {}
+
+def normalize_team_name(short_name, full_names):
+    """
+    Map a short team name (e.g., 'BOO', 'VHF', 'SKE') to its full name.
+    Handles abbreviations like SKE -> Skellefteå AIK
+    """
+    short_name = short_name.strip().upper()
+
+    # Already mapped?
+    if short_name in team_name_mapping:
+        return team_name_mapping[short_name]
+
+    best_match = None
+    best_score = 0
+
+    for full_name in full_names:
+        full_upper = full_name.upper()
+
+        # Exact match
+        if short_name == full_upper:
+            best_match = full_name
+            best_score = 1.0
+            break
+
+        # Starts with (BOO matches Boo HC)
+        if full_upper.startswith(short_name):
+            score = 0.95
+            if score > best_score:
+                best_score = score
+                best_match = full_name
+
+        # Check if any word starts with the short name (SKE in Skellefteå AIK)
+        words = full_upper.split()
+        for word in words:
+            if word.startswith(short_name):
+                score = 0.9
+                if score > best_score:
+                    best_score = score
+                    best_match = full_name
+                break
+
+    if best_match:
+        team_name_mapping[short_name] = best_match
+        DEBUG == 1 and print(f"Mapped team: '{short_name}' -> '{best_match}'")
+        return best_match
+
+    print(f"WARNING: Could not map team '{short_name}'")
+    return short_name
+
 def getLineUps(matchid, matchdate, gametext, series):
     home_team, away_team = map(str.strip, gametext.split(" - "))
     parsed_home_team = re.sub(r"\s*\(.*?\)|\s+", " ", home_team).strip()
@@ -16,6 +67,7 @@ def getLineUps(matchid, matchdate, gametext, series):
 
     # URL of the webpage
     lineUpsUrl = f"https://stats.swehockey.se/Game/LineUps/{matchid}"
+    gameEventsUrl = f"https://stats.swehockey.se/Game/Events/{matchid}"
     print('Collects lineup from ' + lineUpsUrl)
 
     # Send a GET request to fetch the webpage content
@@ -72,7 +124,7 @@ def ensure_player(stats, team, player_name, number):
             "events": []
         }
         
-def add_player_goal(stats, team, player_name, number, matchdate, series, home, away):
+def add_player_goal(stats, team, player_name, number, matchdate, series, home, away, game_id):
     ensure_player(stats, team, player_name, number)
 
     stats[team][player_name]["goals"] += 1
@@ -83,12 +135,13 @@ def add_player_goal(stats, team, player_name, number, matchdate, series, home, a
         "date": matchdate,
         "series": series,
         "home": home,
-        "away": away
+        "away": away,
+        "game_id": game_id
     })
 
     return stats
     
-def add_player_assist(stats, team, player_name, number, matchdate, series, home, away):
+def add_player_assist(stats, team, player_name, number, matchdate, series, home, away, game_id):
     ensure_player(stats, team, player_name, number)
 
     stats[team][player_name]["assists"] += 1
@@ -99,12 +152,13 @@ def add_player_assist(stats, team, player_name, number, matchdate, series, home,
         "date": matchdate,
         "series": series,
         "home": home,
-        "away": away
+        "away": away,
+        "game_id": game_id
     })
 
     return stats
 
-def add_player_pim(stats, team, player_name, number, pim, matchdate, series, home, away):
+def add_player_pim(stats, team, player_name, number, pim, matchdate, series, home, away, game_id):
     ensure_player(stats, team, player_name, number)
 
     stats[team][player_name]["pim"] += pim
@@ -114,7 +168,8 @@ def add_player_pim(stats, team, player_name, number, pim, matchdate, series, hom
         "date": matchdate,
         "series": series,
         "home": home,
-        "away": away
+        "away": away,
+        "game_id": game_id
     })
 
     return stats
@@ -161,17 +216,17 @@ def getGameStats(game_id, serie, matchdate, gametext):
                 away_goals = new_away
                 scoring_team = parsed_away_team
 
-            players = parse_goal(players_str, matchdate, serie, scoring_team, parsed_home_team, parsed_away_team)
+            players = parse_goal(players_str, matchdate, serie, scoring_team, parsed_home_team, parsed_away_team, game_id)
         elif not pd.isna(event) and re.match(r"(\d+ min)", event):
             match = re.match(r"(\d+) min", event)
             pim = int(match.group(1))
             if pim == 1:
                 pim = 2
             DEBUG == 1 and print(f"Penalty found for {matchdate} {event} {team} {time}: {players_str} {match.group(1)}")
-            playes = parse_penalty(players_str, matchdate, serie, team, pim, parsed_home_team, parsed_away_team)
+            playes = parse_penalty(players_str, matchdate, serie, team, pim, parsed_home_team, parsed_away_team, game_id)
 
 
-def parse_penalty(player_string, matchdate, serie, team, time, home_team, away_team):
+def parse_penalty(player_string, matchdate, serie, team, time, home_team, away_team, game_id):
     # Updated regex to handle special characters including Scandinavian ones like 'ø', 'å', etc.
     # Updated regex to handle accented characters like 'é', 'è', 'ø', etc., and hyphenated last names
     pattern = r"(\d+)\.\s+([A-Za-zÅÄÖåäöÉéèÁáÀàÁáøØüæ'`-]+(?:\s+[A-Za-zÅÄÖåäöÉéèÁáÀàÁáøØüæ'`-]+)*),\s+([A-Za-zÅÄÖåäöÉéèÁáÀàÁáøØü'`-]+)"
@@ -187,12 +242,16 @@ def parse_penalty(player_string, matchdate, serie, team, time, home_team, away_t
     number = match.group(1)  # Player number, e.g., "18"
     surname = match.group(2)  # Surname, e.g., "Andersson"
     firstname = match.group(3)  # Firstname, e.g., "Henry"
-    add_player_pim(player_stats, team, f"{firstname} {surname}", number, time, matchdate, serie, home_team, away_team)
-    DEBUG == 1 and print(f"Penalty added for Player: Number='{number}', Name='{surname}, {firstname}'")
+
+    # Normalize team name to match lineup teams
+    normalized_team = normalize_team_name(team, list(player_stats.keys()))
+
+    add_player_pim(player_stats, normalized_team, f"{firstname} {surname}", number, time, matchdate, serie, home_team, away_team, game_id)
+    DEBUG == 1 and print(f"Penalty added for Player: Number='{number}', Name='{firstname} {surname}' Team: {normalized_team}")
 
 
 # Function to process the players_event string
-def parse_goal(input_string, matchdate, serie, team, home_team, away_team):
+def parse_goal(input_string, matchdate, serie, team, home_team, away_team, game_id):
     # parse_goal expression to match both goal scorer and assist (ensuring no digits in names)
     pattern = r"(\d{1,2})\.\s+([A-Za-zåäöÅÄÖ-]+),\s+([A-Za-zåäöÅÄÖ-]+)"
 
@@ -200,16 +259,19 @@ def parse_goal(input_string, matchdate, serie, team, home_team, away_team):
     matches = re.findall(pattern, input_string)
     # Process the matches to assign goal scorer and assist
     if len(matches) >= 1:
+        # Normalize team name to match lineup teams
+        normalized_team = normalize_team_name(team, list(player_stats.keys()))
+
         # Goal scorer (first match)
         goal_number, goal_surname, goal_firstname = matches[0]
-        add_player_goal(player_stats, team, f"{goal_firstname} {goal_surname}", goal_number, matchdate, serie, home_team, away_team)
-        DEBUG == 1 and print(f"Date: {matchdate}  Team: {team} Serie: {serie} Goal Scorer: #{goal_number} '{goal_firstname} {goal_surname}'")
+        add_player_goal(player_stats, normalized_team, f"{goal_firstname} {goal_surname}", goal_number, matchdate, serie, home_team, away_team, game_id)
+        DEBUG == 1 and print(f"Date: {matchdate}  Team: {normalized_team} Serie: {serie} Goal Scorer: #{goal_number} '{goal_firstname} {goal_surname}'")
 
         # Assists (remaining matches)
         for assist in matches[1:]:
             assist_number, assist_surname, assist_firstname = assist
-            add_player_assist(player_stats, team, f"{assist_firstname} {assist_surname}", assist_number, matchdate, serie, home_team, away_team)
-            DEBUG == 1 and print(f"Date: {matchdate} Team: {team} Serie: {serie} Assist: #{assist_number} '{assist_firstname} {assist_surname}'")
+            add_player_assist(player_stats, normalized_team, f"{assist_firstname} {assist_surname}", assist_number, matchdate, serie, home_team, away_team, game_id)
+            DEBUG == 1 and print(f"Date: {matchdate} Team: {normalized_team} Serie: {serie} Assist: #{assist_number} '{assist_firstname} {assist_surname}'")
     else:
         print(f"ERROR: Could not parse {input_string}")
       
@@ -253,8 +315,35 @@ def getAllScheduledGames(schedule_id):
 
     # Identify columns dynamically
     col_date = [c for c in df_games.columns if "Date" in c][0]
-    col_game = [c for c in df_games.columns if "Game" in c][0]
-    col_result = [c for c in df_games.columns if "Result" in c][0]
+
+    # Check which column has the match link by looking at first row
+    # The column with javascript:openonlinewindow('/Game/Events/...') is the score column
+    game_col = [c for c in df_games.columns if "Game" in c][0]
+    result_col = [c for c in df_games.columns if "Result" in c][0]
+    empty_cols = [c for c in df_games.columns if c == '' or (isinstance(c, str) and c.strip() == '')]
+
+    # Check first row to determine which column has the game link
+    first_row = df_games.iloc[0]
+
+    # Helper function to check if value contains game link
+    def has_game_link(val):
+        if isinstance(val, tuple) and len(val) >= 2 and val[1]:
+            return '/Game/Events/' in str(val[1])
+        return False
+
+    if has_game_link(first_row[result_col]):
+        # U15/Standard structure: Game has matchup, Result has score+link
+        col_game = game_col
+        col_result = result_col
+    elif empty_cols and has_game_link(first_row[empty_cols[0]]):
+        # SHL structure: Result has matchup, empty column has score+link
+        col_game = result_col
+        col_result = empty_cols[0]
+    else:
+        # Fallback: assume standard structure
+        col_game = game_col
+        col_result = result_col
+
     col_venue = [c for c in df_games.columns if "Venue" in c][0]
     col_group = next((c for c in df_games.columns if "Group" in c), None)
 
@@ -266,6 +355,9 @@ def getAllScheduledGames(schedule_id):
         "venue": df_games[col_venue],
         "group": df_games[col_group] if col_group else header_group
     })
+
+    # Track current date for SHL-style tables where date appears once for multiple games
+    current_date = None
 
     for ind in clean.index:
         # Extract game text and href
@@ -281,6 +373,17 @@ def getAllScheduledGames(schedule_id):
             date_text = date_val[0]
         else:
             date_text = date_val
+
+        # Check if date_text is a full date or just a time
+        # Full date format: "2025-09-13" or "2025-09-13 19:00"
+        # Time only format: "19:00" or "15:15"
+        if date_text and re.match(r'\d{4}-\d{2}-\d{2}', date_text):
+            # This is a full date, extract and save it
+            current_date = date_text.split()[0]
+        elif date_text and re.match(r'\d{2}:\d{2}', date_text) and current_date:
+            # This is just a time, use the last valid date
+            date_text = current_date
+
         result_text, result_href = clean['result'][ind] if isinstance(clean['result'][ind], tuple) else (clean['result'][ind], None)
         # Handle venue - may be string or tuple
         venue_val = clean['venue'][ind]
@@ -298,9 +401,6 @@ def getAllScheduledGames(schedule_id):
             group_text = group_val
             group_href = None
         DEBUG == 1 and print(f"Date: {date_text} Game: {game_text} Result: {result_text} Venue: {venue_text} Group: {group_text}")
-        # Filter rows that contain "Boo HC"
-        #if "Boo HC" not in game_text:
-        #    continue  # Skip rows that don't match
 
         # Skip if result_href is None
         if result_href is None:
@@ -352,18 +452,20 @@ def write_player_stats_csv(stats, filename="player_stats.csv"):
 def write_events_csv(stats, filename="player_events.csv"):
     """
     Write all player events to CSV file
-    Format: DATE;GROUP;TYPE;PLAYER NAME;PLAYER TEAM;HOME TEAM;AWAY TEAM
+    Format: DATE;GROUP;TYPE;PLAYER NAME;PLAYER TEAM;HOME TEAM;AWAY TEAM;GAME ID;GAME LINK
     """
     with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
         csvwriter = csv.writer(csvfile, delimiter=';')
         # Write header
-        csvwriter.writerow(["DATE", "GROUP", "TYPE", "PLAYER NAME", "PLAYER TEAM", "HOME TEAM", "AWAY TEAM"])
+        csvwriter.writerow(["DATE", "GROUP", "TYPE", "PLAYER NAME", "PLAYER TEAM", "HOME TEAM", "AWAY TEAM", "GAME ID", "GAME LINK"])
 
         # Collect all events with player info
         all_events = []
         for team, players in stats.items():
             for name, data in players.items():
                 for event in data['events']:
+                    game_id = event.get('game_id', '')
+                    game_link = f"https://stats.swehockey.se/Game/Events/{game_id}" if game_id else ""
                     all_events.append({
                         'date': event['date'],
                         'series': event['series'],
@@ -372,7 +474,9 @@ def write_events_csv(stats, filename="player_events.csv"):
                         'away': event['away'],
                         'player_name': name,
                         'player_team': team,
-                        'minutes': event.get('minutes', '')
+                        'minutes': event.get('minutes', ''),
+                        'game_id': game_id,
+                        'game_link': game_link
                     })
 
         # Sort by date
@@ -391,7 +495,9 @@ def write_events_csv(stats, filename="player_events.csv"):
                 event['player_name'],
                 event['player_team'],
                 event['home'],
-                event['away']
+                event['away'],
+                event['game_id'],
+                event['game_link']
             ])
 
     print(f"Player events written to {filename}")
@@ -439,18 +545,20 @@ def print_all_stats(stats):
 
             for e in events_sorted:
                 etype = e["type"].upper()
+                game_id = e.get('game_id', '')
+                game_link = f"https://stats.swehockey.se/Game/Events/{game_id}" if game_id else ""
 
                 if etype == "GOAL":
-                    print(f"      {e['date']}  GOAL     vs {e['home']} / {e['away']}  ({e['series']})")
+                    print(f"      {e['date']}  GOAL     vs {e['home']} / {e['away']}  ({e['series']})  [{game_link}]")
 
                 elif etype == "ASSIST":
-                    print(f"      {e['date']}  ASSIST   vs {e['home']} / {e['away']}  ({e['series']})")
+                    print(f"      {e['date']}  ASSIST   vs {e['home']} / {e['away']}  ({e['series']})  [{game_link}]")
 
                 elif etype == "PIM":
-                    print(f"      {e['date']}  PIM {e['minutes']:>2}  vs {e['home']} / {e['away']}  ({e['series']})")
+                    print(f"      {e['date']}  PIM {e['minutes']:>2}  vs {e['home']} / {e['away']}  ({e['series']})  [{game_link}]")
 
                 elif etype == "PLAYED":
-                    print(f"      {e['date']}  PLAYED   vs {e['home']} / {e['away']}  ({e['series']})")
+                    print(f"      {e['date']}  PLAYED   vs {e['home']} / {e['away']}  ({e['series']})  [{game_link}]")
 
         print("\n")
 
