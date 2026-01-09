@@ -474,6 +474,78 @@ def getAllScheduledGamesNew(schedule_id):
 
 
 
+def write_player_stats_csv(stats, filename="player_stats.csv"):
+    """
+    Write player statistics to CSV file
+    Format: TEAM;NUMBER;NAME;GAMES PLAYED;GOALS;ASSISTS;PIM
+    """
+    with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=';')
+        # Write header
+        csvwriter.writerow(["TEAM", "NUMBER", "NAME", "GAMES PLAYED", "GOALS", "ASSISTS", "PIM"])
+
+        # Write data rows
+        for team, players in stats.items():
+            for name, data in players.items():
+                csvwriter.writerow([
+                    team,
+                    data['number'],
+                    name,
+                    data['games_played'],
+                    data['goals'],
+                    data['assists'],
+                    data['pim']
+                ])
+
+    print(f"Player statistics written to {filename}")
+
+def write_events_csv(stats, filename="player_events.csv"):
+    """
+    Write all player events to CSV file
+    Format: DATE;GROUP;TYPE;PLAYER NAME;PLAYER TEAM;HOME TEAM;AWAY TEAM
+    """
+    with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
+        csvwriter = csv.writer(csvfile, delimiter=';')
+        # Write header
+        csvwriter.writerow(["DATE", "GROUP", "TYPE", "PLAYER NAME", "PLAYER TEAM", "HOME TEAM", "AWAY TEAM"])
+
+        # Collect all events with player info
+        all_events = []
+        for team, players in stats.items():
+            for name, data in players.items():
+                for event in data['events']:
+                    all_events.append({
+                        'date': event['date'],
+                        'series': event['series'],
+                        'type': event['type'].upper(),
+                        'home': event['home'],
+                        'away': event['away'],
+                        'player_name': name,
+                        'player_team': team,
+                        'minutes': event.get('minutes', '')
+                    })
+
+        # Sort by date
+        all_events.sort(key=lambda e: e['date'])
+
+        # Write data rows
+        for event in all_events:
+            event_type = event['type']
+            if event_type == 'PIM':
+                event_type = f"PIM {event['minutes']}"
+
+            csvwriter.writerow([
+                event['date'],
+                event['series'],
+                event_type,
+                event['player_name'],
+                event['player_team'],
+                event['home'],
+                event['away']
+            ])
+
+    print(f"Player events written to {filename}")
+
 def print_stats(stats):
     print("\n=== PLAYER STATISTICS ===\n")
 
@@ -583,11 +655,21 @@ if __name__ == "__main__":
     #csvfile = open(csv_file, mode='w', newline='', encoding='utf-8')
     #csvwriter = csv.writer(csvfile)
     #csvwriter.writerow(["Team","Nummer","Player Name","Goals","Assists","PIM"])
-    #getAllScheduledGamesNew('19563')
-    getAllScheduledGamesNew('19565')
+    getAllScheduledGamesNew('19563')
+    #getAllScheduledGamesNew('19565')
+
+    # SHL
+    #getAllScheduledGamesNew('18263')
     #getAllScheduledGames('19565')
     #getAllScheduledGames('19701')
+
+    # Print stats to console
     print_all_stats(player_stats)
+
+    # Write CSV files
+    write_player_stats_csv(player_stats, "player_stats.csv")
+    write_events_csv(player_stats, "player_events.csv")
+
     #getLineUps(1068641, "2025-11-18", "Boo HC - Vallentuna Hockey", "group a")
     exit(0)
 
