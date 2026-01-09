@@ -456,7 +456,9 @@ def print_all_stats(stats):
 
 if __name__ == "__main__":
     # Process schedule and collect statistics
-    getAllScheduledGames('19563')
+    #getAllScheduledGames('19563')
+    # SHL
+    getAllScheduledGames('18263')
 
     # Print stats to console
     print_all_stats(player_stats)
