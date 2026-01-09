@@ -93,7 +93,7 @@ def getAllScheduledGames(schedule_id):
         if "Boo HC" not in game_text:
             continue  # Skip rows that don't match
 
-        print(f"Game Text: {game_text} {df_games['game'][ind]}")
+        print(f"Game Text: {game_text} {df_games['game'][ind]} Venue: {venue_text} Venue Href: {venue_href}")
         # Skip if result_href is None
         if result_href is None:
             continue  # Skip this iteration if result_href is None
@@ -368,8 +368,22 @@ def getAllScheduledGamesNew(schedule_id):
     print("Columns (raw MultiIndex):")
     print(df_games.columns)
 
-    # Flatten MultiIndex
-    df_games.columns = [(str(a) + "_" + str(b)).strip() for a, b in df_games.columns]
+    # Flatten MultiIndex - handle nested tuples
+    flattened_cols = []
+    for col in df_games.columns:
+        # col is like (('Schedule and Results', None), ('Round', None))
+        # We want the last non-None string value
+        if isinstance(col, tuple) and len(col) >= 2:
+            # Get the second element of the tuple (e.g., ('Round', None))
+            inner = col[1]
+            if isinstance(inner, tuple) and len(inner) >= 1:
+                # Use the first element of the inner tuple ('Round')
+                flattened_cols.append(inner[0])
+            else:
+                flattened_cols.append(str(inner))
+        else:
+            flattened_cols.append(str(col))
+    df_games.columns = flattened_cols
 
     print("\n=== DEBUG: Flattened columns ===")
     for i, col in enumerate(df_games.columns):
@@ -573,7 +587,7 @@ if __name__ == "__main__":
     getAllScheduledGamesNew('19565')
     #getAllScheduledGames('19565')
     #getAllScheduledGames('19701')
-    #print_all_stats(player_stats)
+    print_all_stats(player_stats)
     #getLineUps(1068641, "2025-11-18", "Boo HC - Vallentuna Hockey", "group a")
     exit(0)
 
