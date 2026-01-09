@@ -1,18 +1,10 @@
-import numpy as np
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from io import StringIO
 import re
-from collections import defaultdict
-from pprint import pprint
 import csv
 
 DEBUG = 1
-# CSV file name
-csv_file = "all_stats2.csv"
-
-#See https://stats.swehockey.se/ScheduleAndResults/Overview/17147
 
 # Initialize an empty stats dictionary
 player_stats = {}
@@ -39,11 +31,9 @@ def getLineUps(matchid, matchdate, gametext, series):
         line_up_players = soup.find_all('div', class_='lineUpPlayer')
 
         # Loop through the divs and extract the preceding <h3> and format player names
-        for i, player in enumerate(line_up_players):
+        for player in line_up_players:
             # Find the preceding <h3> for each lineUpPlayer
             team_name = player.find_previous('h3').text.strip()
-            #if "Boo HC" not in team_name:
-            #    continue  # Skip rows that don't match
 
             # Extract and clean up player text
             raw_player_text = player.text.strip().replace('\n', ' ')
@@ -59,8 +49,6 @@ def getLineUps(matchid, matchdate, gametext, series):
             # Parse to remove the part in parentheses and extra spaces
             team_name = re.sub(r"\s*\(.*?\)|\s+", " ", team_name).strip()
 
-            # Write the data row
-            #csvwriter.writerow([matchdate, series, parsed_away_team, parsed_home_team, team_name, formatted_name])
             player_name = f"{firstname} {lastname}"
             ensure_player(player_stats, team_name, f"{player_name}", number)
             DEBUG == 1 and print(f"Game played Team: {team_name} Player: {player_name}")
@@ -70,120 +58,6 @@ def getLineUps(matchid, matchdate, gametext, series):
         print(f"Failed to fetch the webpage. Status code: {response.status_code}")
         return (None, None)
    
-def getAllScheduledGames(schedule_id):
-    """
-    Get all games from list of ids
-    Output is dataframe with all games
-    """
-    url = 'http://stats.swehockey.se/ScheduleAndResults/Schedule/' + schedule_id
-    print('Collects scheduled games from ' + url)
-    df_games = pd.read_html(url, extract_links="all", displayed_only=False)[2]
-
-    #df_games.info()
-    df_games.columns = ['round', 'date', 'game', 'result', '4_level_1', 'spectators', 'venue', '7_level_1', '8_level_1']
-
-    # # df_games = df_games[(df_games.game.str.match('.*Boo.*'))]
-    for ind in df_games.index:
-        # Extract game text and href
-        game_text, game_href = df_games['game'][ind]
-        result_text, result_href = df_games['result'][ind] if isinstance(df_games['result'][ind], tuple) else (df_games['result'][ind], None)
-        venue_text, venue_href = df_games['venue'][ind]
-
-        # Filter rows that contain "Boo HC"
-        if "Boo HC" not in game_text:
-            continue  # Skip rows that don't match
-
-        print(f"Game Text: {game_text} {df_games['game'][ind]} Venue: {venue_text} Venue Href: {venue_href}")
-        # Skip if result_href is None
-        if result_href is None:
-            continue  # Skip this iteration if result_href is None
-
-        # Use a regular expression to extract the number
-        match = re.search(r"/Game/Events/(\d+)", result_href)
-        if match:
-            matchid = match.group(1)
-            #game_text, game_href = df_games['game'][ind]
-            ## Extract result text and href
-            #result_text, result_href = df_games['game'][ind]
-            #print(f"Lineup for {df_games['date'][ind][0]} {game_text}")
-            print(f"Retrieving game stats for {matchid} {game_text}")
-
-            getGameStats(matchid, "group", df_games['date'][ind][0].split()[0], game_text)
-        else:
-            print(f"Could not extract match ID from: {result_href}")
-        #print(f"{df_games['date'][ind][0]} {game_text} {venue_text} {number}")
-       
-# def getAllScheduledGames(schedule_id):
-#     url = f"http://stats.swehockey.se/ScheduleAndResults/Schedule/{schedule_id}"
-#     print("Collects scheduled games from", url)
-# 
-#     # Fetch HTML once
-#     response = requests.get(url)
-#     soup = BeautifulSoup(response.text, "html.parser")
-# 
-#     # Extract group name from header
-#     div = soup.select_one("div.d-lg-flex")
-#     if div:
-#         header_group = div.get_text(strip=True).split(",")[0]
-#         print("Group from header:", header_group)
-#     else:
-#         header_group = None
-#         print("Ingen matchande div hittades")
-# 
-#     # Read table from same HTML
-#     df_games = pd.read_html(response.text, extract_links="all", displayed_only=True)[2]
-# 
-#     # Flatten MultiIndex
-#     df_games.columns = [(str(a) + "_" + str(b)).strip() for a, b in df_games.columns]
-# 
-#     # Identify columns dynamically
-#     col_date   = [c for c in df_games.columns if "Date" in c][0]
-#     col_game   = [c for c in df_games.columns if "Game" in c][0]
-#     col_result = [c for c in df_games.columns if "Result" in c][0]
-#     col_venue  = [c for c in df_games.columns if "Venue" in c][0]
-#     col_group  = next((c for c in df_games.columns if "Group" in c), None)
-# 
-#     # Build clean dataframe
-#     clean = pd.DataFrame({
-#         "date": df_games[col_date],
-#         "game": df_games[col_game],
-#         "result": df_games[col_result],
-#         "venue": df_games[col_venue],
-#         "group": df_games[col_group] if col_group else header_group
-#     })
-# 
-#     # Iterate games
-#     for ind in clean.index:
-#         game_text, game_href = clean["game"][ind]
-#         result_text, result_href = clean["result"][ind] if isinstance(clean["result"][ind], tuple) else (clean["result"][ind], None)
-#         venue_text, venue_href = clean["venue"][ind]
-# 
-#         # group may be string or tuple
-#         group_val = clean["group"][ind]
-#         if isinstance(group_val, tuple):
-#             group_text = group_val[0]
-#         else:
-#             group_text = group_val
-# 
-#         print(f"{game_text} {result_text} {venue_text} {group_text}")
-# 
-#         if result_href is None:
-#             continue
-# 
-#         match = re.search(r"/Game/Events/(\d+)", result_href)
-#         if not match:
-#             continue
-# 
-#         matchid = match.group(1)
-#         matchdate = clean["date"][ind][0].split()[0]
-# 
-#         print(f"Retrieving lineups for {matchid} {matchdate} {game_text}")
-#         home_team, away_team = getLineUps(matchid, matchdate, game_text, group_text)
-# 
-#         print(f"Retrieving game stats for {matchid} {matchdate} {game_text}")
-#         getGameStats(matchid, group_text, matchdate, game_text)
-        
-
 def ensure_player(stats, team, player_name, number):
     if team not in stats:
         stats[team] = {}
@@ -339,34 +213,26 @@ def parse_goal(input_string, matchdate, serie, team, home_team, away_team):
     else:
         print(f"ERROR: Could not parse {input_string}")
       
-def getAllScheduledGamesNew(schedule_id):
+def getAllScheduledGames(schedule_id):
     """
-    Get all games from list of ids
-    Output is dataframe with all games
+    Get all games from a schedule ID and process lineups and game statistics
     """
-    url = 'http://stats.swehockey.se/ScheduleAndResults/Schedule/' + schedule_id
-    print('Collects scheduled games from ' + url)
+    url = f'http://stats.swehockey.se/ScheduleAndResults/Schedule/{schedule_id}'
+    print(f'Collects scheduled games from {url}')
     response = requests.get(url)
-    print(f"{response.text}")
 
-    # Find group name from text
+    # Find group name from header
     soup = BeautifulSoup(response.text, "html.parser")
-    # Hämta första d-lg-flex-diven
     div = soup.select_one("div.d-lg-flex:nth-child(1)")
 
     if div:
         header_group = div.get_text(strip=True).split(",")[0]
-        print("Group from header:", header_group)
+        print(f"Group from header: {header_group}")
     else:
         header_group = None
-        print("Ingen matchande div hittades")
-    df_games = pd.read_html(response.text, extract_links="all", displayed_only=False)[2]
-    #df_games = pd.read_html(response.text, extract_links="all", displayed_only=False)[2]
+        print("No matching div found for group header")
 
-    print("\n=== DEBUG: RAW df_games ===")
-    print("Shape:", df_games.shape)
-    print("Columns (raw MultiIndex):")
-    print(df_games.columns)
+    df_games = pd.read_html(response.text, extract_links="all", displayed_only=False)[2]
 
     # Flatten MultiIndex - handle nested tuples
     flattened_cols = []
@@ -385,13 +251,6 @@ def getAllScheduledGamesNew(schedule_id):
             flattened_cols.append(str(col))
     df_games.columns = flattened_cols
 
-    print("\n=== DEBUG: Flattened columns ===")
-    for i, col in enumerate(df_games.columns):
-        print(f"{i}: {col}")
-
-    print("\n=== DEBUG: First 5 rows of df_games ===")
-    print(df_games.head(5))
-
     # Identify columns dynamically
     col_date = [c for c in df_games.columns if "Date" in c][0]
     col_game = [c for c in df_games.columns if "Game" in c][0]
@@ -407,15 +266,6 @@ def getAllScheduledGamesNew(schedule_id):
         "venue": df_games[col_venue],
         "group": df_games[col_group] if col_group else header_group
     })
-
-    print("\n=== DEBUG: Sample unpacking of first rows ===")
-    for i in range(min(5, len(clean))):
-        print(f"\nRow {i}:")
-        print("  date  =", clean['date'][i])
-        print("  game  =", clean['game'][i])
-        print("  result=", clean['result'][i])
-        print("  venue =", clean['venue'][i])
-        print("  group =", clean['group'][i])
 
     for ind in clean.index:
         # Extract game text and href
@@ -603,65 +453,10 @@ def print_all_stats(stats):
                     print(f"      {e['date']}  PLAYED   vs {e['home']} / {e['away']}  ({e['series']})")
 
         print("\n")
-        
-def main():
-    # U13 2023-2024
-    #getAllScheduledGames('15253',"U13 Grupp 3")
-    #getAllScheduledGames('15579',"U13 Grupp B Syd")
-    #getAllScheduledGames('15255',"U13 Grupp 5")
-
-    # U14 2024-2025
-    csvfile = open(csv_file, mode='w', newline='', encoding='utf-8')
-    csvwriter = csv.writer(csvfile)
-    # Write the header row
-    csvwriter.writerow(["Team", "Numner", "Player Name", "Goals", "Assists", "PIM"])
-
-    #getAllScheduledGames('16581',"U14 Röd Öst",csvwriter)
-    #getAllScheduledGames('16579',"U14 Blå 2",csvwriter)
-    #getAllScheduledGames('16007',"U14 DM Grupp 3",csvwriter)
-    #getAllScheduledGames('17146',"U14 Grupp A",csvwriter)
-    #getAllScheduledGames('17147',"U14 Grupp B2",csvwriter)
-    #getAllScheduledGames('16010',"U14 DM slutspel",csvwriter)
-
-    #getAllScheduledGames('17283',"GIC Blå Dag 1",csvwriter)
-    #getAllScheduledGames('17300',"GIC Blå Dag 2",csvwriter)
-
-    #getAllScheduledGames('17274',"GIC Blå Dag 1",csvwriter)
-    #https://stats.swehockey.se/ScheduleAndResults/Schedule/17274
-    getAllScheduledGamesNew('19563')
-
-    # Print the stats
-    for team, players in player_stats.items():
-        #print(f"Team: {team}")
-        for player_name, stats in players.items():
-            csvwriter.writerow([team, stats['number'], player_name, stats['goals'], stats['assists'], stats['pim']])
-            #print(f"  Player: {player_name}, Number: {stats['number']}, Goals: {stats['goals']}, "
-            #      f"Assists: {stats['assists']}, PIM: {stats['pim']}")
-
-    #for key, statitems in player_summary.items():
-    #    DEBUG == 1 and print(f"key='{key}', statitems='{statitems}'")
-    #    for series, stats in statitems.items():
-    #        DEBUG == 1 and print(f"series='{series}', stats='{stats}'")
-    #        name = stats.get('name', 'N/A')
-    #        goals = stats.get('goals', 0)
-    #        assists = stats.get('assists', 0)
-    #        DEBUG == 1 and print(f"{series}, {name}, {goals}, {assists}")
-    #        csvwriter.writerow([series, name, goals,assists])
-
 
 if __name__ == "__main__":
-    #main()
-    # Write the header row
-    #csvfile = open(csv_file, mode='w', newline='', encoding='utf-8')
-    #csvwriter = csv.writer(csvfile)
-    #csvwriter.writerow(["Team","Nummer","Player Name","Goals","Assists","PIM"])
-    getAllScheduledGamesNew('19563')
-    #getAllScheduledGamesNew('19565')
-
-    # SHL
-    #getAllScheduledGamesNew('18263')
-    #getAllScheduledGames('19565')
-    #getAllScheduledGames('19701')
+    # Process schedule and collect statistics
+    getAllScheduledGames('19563')
 
     # Print stats to console
     print_all_stats(player_stats)
@@ -669,7 +464,4 @@ if __name__ == "__main__":
     # Write CSV files
     write_player_stats_csv(player_stats, "player_stats.csv")
     write_events_csv(player_stats, "player_events.csv")
-
-    #getLineUps(1068641, "2025-11-18", "Boo HC - Vallentuna Hockey", "group a")
-    exit(0)
 
